@@ -1,0 +1,309 @@
+function touchstart (event, ins) {
+	var state = ins.getState()
+	if ( state.isTouch || state.disableTouch ) {
+		return
+	}
+	state.isTouch = true
+	state.touchTime = 0
+	state.interval = true
+	setInterval(ins)
+	var touch = event.touches[0]
+	state.startX = touch.pageX
+	state.startY = touch.pageY
+}
+function touchmove (event, ins) {
+	var state = ins.getState()
+	if ( state.isTouch && !state.disableTouch ) {
+		var touch = event.touches[0]
+		state.offset = state.vertical ? touch.pageY - state.startY : touch.pageX - state.startX;
+		if (state.direction) {
+			var rect = ins.getBoundingClientRect()
+			var size = state.vertical ? rect.height : rect.width
+			state.offset = state.direction == 'next' ? state.offset + state.sliderFault : state.offset - state.sliderFault
+			if ( (state.offset > 0 && state.direction == 'next') || (state.offset < 0 && state.direction == 'prev') ) {
+				state.offset = 0
+			}
+			if ( Math.abs(state.offset) <= size ) {
+				animation(state.offset, 0, ins)
+			}
+		} else {
+			if ( Math.abs(state.offset) < state.sliderFault ) return
+			if ( state.offset < 0 ) {
+				if ( state.nextIndex < state.count && (state.nextIndex != 0 || state.circular) ) {
+					state.direction = 'next'
+				} else if ( state.pullupable && state.loadingState != 'loading' && state.loadingState != 'success' && state.loadingState != 'fail' ) {
+					state.loadingType = 'pullup'
+					state.offset = state.offset + state.sliderFault
+					pulling(state.offset, ins)
+				}
+			} else {
+				if ( state.prevIndex >= 0 && (state.prevIndex != state.count - 1 || state.circular) ) {
+					state.direction = 'prev'
+				} else if ( state.pulldownable && state.loadingState != 'loading' && state.loadingState != 'success' && state.loadingState != 'fail' ) {
+					state.loadingType = 'pulldown'
+					state.offset = state.offset - state.sliderFault
+					pulling(state.offset, ins)
+				}
+			}
+		}
+	}
+}
+function touchend (event, ins) {
+	touchaction(event, ins)
+}
+function touchcancel (event, ins) {
+	touchaction(event, ins)
+}
+function touchaction (event, ins) {
+	var state = ins.getState()
+	clearInterval(ins)
+	if ( state.isTouch && !state.disableTouch ) {
+		if (state.direction) {
+			var rect = ins.getBoundingClientRect()
+			var size = state.vertical ? rect.height : rect.width
+			state.disableTouch = true
+			if (state.touchTime <= 200) {
+				var duration = state.duration;
+				var value = state.direction == 'next' ? 1 : -1;
+				animation(-value * size, duration, ins);
+				ins.setTimeout(function () {
+					ins.callMethod('handleSliderChange', value);
+				}, duration + 50)
+			} else {
+				var duration = state.duration;
+				if (Math.abs(state.offset) >= size / 4) {
+					var value = state.direction == 'next' ? 1 : -1;
+					animation(-value * size, duration, ins);
+					ins.setTimeout(function () {
+						ins.callMethod('handleSliderChange', value);
+					}, duration + 50)
+				} else {
+					animation(0, duration, ins);
+					ins.setTimeout(function () {
+						resetSlider(ins);
+					}, duration + 50)
+				}
+			}
+		} else if ( state.loadingState == 'default' ) {
+			resetPulling(ins)
+		} else if ( state.loadingState == 'ready' ) {
+			pullingRefresh(ins)
+		} else {
+			resetSlider(ins)
+		}
+	}
+}
+function propWatcher (newVal, oldVal, ins) {
+	ins.setTimeout(function () {
+		if ( newVal ) {
+			var state = ins.getState()
+			state.vertical = newVal.vertical
+			state.circular = newVal.circular
+			state.duration = newVal.duration
+			state.pulldownable = newVal.pulldownable
+			state.pullupable = newVal.pullupable
+			state.pulldownHeight = newVal.pulldownHeight
+			state.loadingState = newVal.loadingState
+			state.pullupHeight = newVal.pullupHeight
+			state.nextIndex = newVal.nextIndex
+			state.prevIndex = newVal.prevIndex
+			state.currentIndex = newVal.currentIndex
+			state.sliderFault = newVal.sliderFault
+			state.count = newVal.count
+			state.translate = newVal.translate
+			if ( oldVal && newVal.currentIndex != oldVal.currentIndex ) {
+				var rect = ins.getBoundingClientRect()
+				var size = state.vertical ? rect.height : rect.width
+				var translate = state.translate
+				var draw = function () {
+					if ( state.prevIndex >= 0 ) {
+						ins.selectComponent('.yingbing-slider-item_' + state.prevIndex).setStyle({
+							transform: translate + '(-' + size + 'px)',
+							transition: ''
+						})
+					}
+					ins.selectComponent('.yingbing-slider-item_' + state.currentIndex).setStyle({
+						transform: translate + '(0)',
+						transition: ''
+					})
+					if ( state.nextIndex < state.count ) {
+						ins.selectComponent('.yingbing-slider-item_' + state.nextIndex).setStyle({
+							transform: translate + '(' + size + 'px)',
+							transition: ''
+						})
+					}
+				}
+				ins.requestAnimationFrame(draw)
+				resetSlider(ins);
+			}
+			if ( oldVal && newVal.loadingState != oldVal.loadingState && state.loadingState ) {
+				resetPulling(ins)
+				ins.callMethod('resetLoading')
+			}
+			if (oldVal && newVal.slideTo != oldVal.slideTo && newVal.slideTo != 0 ) {
+				if ( !state.disableTouch ) {
+					if ( newVal.slideTo < 0 && state.prevIndex >= 0 && (state.prevIndex != state.count - 1 || state.circular) ) {
+						state.isTouch = true
+						state.touchTime = 0
+						state.direction = 'prev'
+						touchaction(null, ins)
+					}
+					if ( newVal.slideTo > 0 && state.nextIndex < state.count && (state.nextIndex != 0 || state.circular) ) {
+						state.isTouch = true
+						state.touchTime = 0
+						state.direction = 'next'
+						touchaction(null, ins)
+					}
+				}
+			}
+		}
+	}, 100)
+}
+function setInterval (ins) {
+	var state = ins.getState()
+	state.touchTimer = ins.setTimeout(function () {
+		state.touchTime += 10
+		if ( state.interval ) {
+			setInterval(ins)
+		}
+	}, 10)
+}
+function clearInterval (ins) {
+	var state = ins.getState()
+	state.interval = false
+	if ( state.touchTimer ) {
+		ins.clearTimeout(state.touchTimer)
+		state.touchTimer = null
+	}
+}
+function resetSlider (ins) {
+	var state = ins.getState()
+	state.direction = null
+	state.isTouch = false
+	state.disableTouch = false
+	state.offset = 0
+	state.touchTime = 0
+	state.startX = 0
+	state.startY = 0
+}
+function animation (offset, duration, ins) {
+	var state = ins.getState()
+	var rect = ins.getBoundingClientRect()
+	var translate = state.translate
+	var size = state.vertical ? rect.height : rect.width
+	var late = offset
+	var draw = function () {
+		if ( state.prevIndex >= 0 ) {
+			ins.selectComponent('.yingbing-slider-item_' + state.prevIndex).setStyle({
+				transform: translate + '(' + (late - size) + 'px)',
+				transition: duration > 0 ? 'transform ' + duration + 'ms' : ''
+			})
+		}
+		ins.selectComponent('.yingbing-slider-item_' + state.currentIndex).setStyle({
+			transform: translate + '(' + late + 'px)',
+			transition: duration > 0 ? 'transform ' + duration + 'ms' : ''
+		})
+		if ( state.nextIndex < state.count ) {
+			ins.selectComponent('.yingbing-slider-item_' + state.nextIndex).setStyle({
+				transform: translate + '(' + (late + size) + 'px)',
+				transition: duration > 0 ? 'transform ' + duration + 'ms' : ''
+			})
+		}
+	}
+	ins.requestAnimationFrame(draw)
+}
+function pulling (offset, ins) {
+	var state = ins.getState()
+	var loadingType = state.loadingType
+	var translate = state.translate
+	var size = loadingType == 'pullup' ? state.pullupHeight : state.pulldownHeight
+	var late = offset
+	if ( Math.abs(state.offset) < size ) {
+		state.loadingState = 'default'
+	} else {
+		state.loadingState = 'ready'
+	}
+	var draw = function () {
+		var pullingItems = ins.selectAllComponents('.yingbing-slider-' + loadingType + '-item')
+		for ( var i = 0; i < pullingItems.length; i++ ) {
+			if ( pullingItems[i].hasClass('yingbing-slider-' + loadingType + '-' + state.loadingState) ) {
+				pullingItems[i].setStyle({
+					visibility: 'visible'
+				})
+			} else {
+				pullingItems[i].setStyle({
+					visibility: 'hidden'
+				})
+			}
+		}
+		if ( Math.abs(late) <= size ) {
+			ins.selectComponent('.yingbing-slider-' + loadingType).setStyle({
+				transform: translate + '(' + (loadingType == 'pullup' ? late + size : late - size) + 'px)',
+				transition: ''
+			})
+		}
+	}
+	ins.requestAnimationFrame(draw)
+}
+function resetPulling (ins) {
+	var state = ins.getState()
+	var loadingType = state.loadingType
+	var translate = state.translate
+	var size = loadingType == 'pullup' ? state.pullupHeight : state.pulldownHeight
+	var draw = function () {
+		var pullingItems = ins.selectAllComponents('.yingbing-slider-' + loadingType + '-item')
+		for ( var i = 0; i < pullingItems.length; i++ ) {
+			if ( pullingItems[i].hasClass('yingbing-slider-' + loadingType + '-' + state.loadingState) ) {
+				pullingItems[i].setStyle({
+					visibility: 'visible'
+				})
+			} else {
+				pullingItems[i].setStyle({
+					visibility: 'hidden'
+				})
+			}
+		}
+		ins.selectComponent('.yingbing-slider-' + loadingType).setStyle({
+			transform: translate + '(' + (loadingType == 'pullup' ? size : -size) + 'px)',
+			transition: 'transform .3s'
+		})
+	}
+	ins.requestAnimationFrame(draw)
+	if ( state.loadingState ) {
+		ins.setTimeout( function () {
+			state.loadingState = ''
+			resetPulling(ins)
+		}, 300)
+	} else {
+		state.loadingType = ''
+		resetSlider(ins)
+	}
+}
+function pullingRefresh (ins) {
+	var state = ins.getState()
+	state.loadingState = 'loading'
+	var loadingType = state.loadingType
+	var draw = function () {
+		var pullingItems = ins.selectAllComponents('.yingbing-slider-' + loadingType + '-item')
+		for ( var i = 0; i < pullingItems.length; i++ ) {
+			if ( pullingItems[i].hasClass('yingbing-slider-' + loadingType + '-loading') ) {
+				pullingItems[i].setStyle({
+					visibility: 'visible'
+				})
+			} else {
+				pullingItems[i].setStyle({
+					visibility: 'hidden'
+				})
+			}
+		}
+	}
+	ins.requestAnimationFrame(draw)
+	ins.callMethod('pullingRefresh', state.loadingType)
+}
+module.exports = {
+	touchstart: touchstart,
+	touchmove: touchmove,
+	touchend: touchend,
+	touchcancel: touchcancel,
+	propWatcher: propWatcher
+}

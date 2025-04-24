@@ -1,0 +1,853 @@
+<template>
+  <view class="video-wrap">
+    <video
+      id="myVideo111"
+      ref="myVideo111"
+      class="video"
+      :controls="false"
+      :src="src"
+      :autoplay="autoPlay"
+      :show-center-play-btn="showCenterPlayBtn"
+      @controlstoggle="controlstoggle"
+      @timeupdate="timeupdate"
+      @play="play"
+      @pause="pause"
+      @ended="ended"
+      @progress="progress"
+      @loadedmetadata="loadedmetadata"
+    >
+    <!-- 全屏 start -->
+
+      <!-- 锁屏状态 -->
+      <ComCoverView class="" v-if="isFullScreen && isLocked">
+        <view class="video-content-box" v-if="isFullScreen && isLocked" @tap="onclick">
+          <view @tap.stop.prevent="lockClick" v-if="controlsShow" class="lock f-center wh-40" :style="[lockStyle]">
+            <text class="iconfont">&#xe621;</text>
+          </view>
+        </view>
+      </ComCoverView>
+
+      <!-- 解锁屏状态 -->
+      <ComCoverView aaaaa="12312" v-if="isFullScreen && !isLocked" class="" style="position: relative;">
+        <view class="video-content-box" v-if="isFullScreen && !isLocked" @tap="onclick"
+        >
+          <view
+            @tap.stop.prevent="lockClick"
+            v-if="controlsShow"
+            class="lock f-center wh-40"
+            :style="[lockStyle]"
+          >
+            <text class="iconfont">&#xe62a;</text>
+          </view>
+
+          <!-- 头部控件区域 -->
+          <view class="video-control-header" v-if="controlsShow" @tap.stop.prevent="controllerAreaClick" :style="[headerStyle]">
+            <view class="back">
+              <view class="plr-10" @tap.stop.prevent="exitFullScreen"><text class="iconfont">&#xe600;</text></view>
+              <view class="back-text">
+                <text class="back-text">{{videoTitle}}</text>
+              </view>
+            </view>
+
+            <view class="header-right">
+              <!-- 收藏 -->
+              <view @tap.stop.prevent="onCollectClick" class="mr-10 plr-10">
+                <text v-if="isCollect" class="iconfont">&#xe65b;</text>
+                <text v-else class="iconfont">&#xe65a;</text>
+              </view>
+              <!-- 分享 -->
+              <view @tap.stop.prevent="onShareClick" class="mr-10 plr-10">
+                <text class="iconfont">&#xe626;</text>
+              </view>
+              <!-- 更多 -->
+              <view @tap.stop.prevent="onMoreClick" class="mr-10 plr-10">
+                <text class="iconfont">&#xe624;</text>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 底部控件区域 -->
+          <view
+            class="video-control-footer video-control-footer-fullscreen"
+            v-if="controlsShow"
+            @tap.stop.prevent="controllerAreaClick"
+            :style="[fullScreenFooterStyle]"
+          >
+            <view class="flex-row-sb">
+              <text class="c-white time">{{ secondToMinute(current) }}</text>
+              <VideoSlider
+                :max="duration"
+                :value="current"
+                :width="sliderWidth"
+                :safePadding="safePadding"
+                @touchStart="preventHideControl"
+                @change="sliderChange"
+                :backgroundColor="color"
+                :blockColor="color"
+                :isFullScreen="isFullScreen"
+              ></VideoSlider>
+              <text class="c-white time">{{ secondToMinute(duration) }}</text>
+            </view>
+
+            <view class="flex-row-sb flex-1">
+              <view class="flex-row-sb">
+                <!-- 播放/暂停 -->
+                <view v-if="playing" class="plr-10" @tap.stop="pauseVideo">
+                  <text class="iconfont">&#xe633;</text>
+                </view>
+                <view v-else class="plr-10" @tap.stop="playVideo">
+                  <text class="iconfont">&#xe623;</text>
+                </view>
+                <view v-if="showBarrage" class="flex-row-sb">
+                  <!-- 弹幕开启状态 -->
+                  <view v-if="isOpenBarrage" class="plr-10">
+                    <text class="iconfont">&#xe60a;</text>
+                  </view>
+                  <view v-else class="plr-10"><text class="iconfont">&#xe609;</text></view>
+                  <!-- 弹幕设置 -->
+                  <view class="plr-10"><text class="iconfont">&#xe608;</text></view>
+                </view>
+              </view>
+
+              <view class="flex-1 plr-10">
+                <input
+                  type="text"
+                  class="input"
+                  @focus="onDanMuFocus"
+                  value=""
+                  placeholder="输入弹幕"
+                  placeholder-style="color:#555;"
+                />
+              </view>
+
+              <view class="flex-row-sb">
+                <view class="plr-10 " @tap.stop.prevent="rateShow = true">
+                  <text class="c-white font-size">字幕</text>
+                </view>
+                <view class="plr-10 " @tap.stop.prevent="rateShowClick" v-if="showPlayRate">
+                  <text class="c-white font-size">倍数</text>
+                </view>
+                <!-- 下载 -->
+                <view @tap.stop.prevent="fullScreen" class="plr-10 " v-if="showDownload">
+                  <text class="iconfont">&#xe629;</text>
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <!-- 弹出功能区 -->
+          
+          <!-- 倍速播放 -->
+          <PlayRateList :currentRate="currentRate" :rateShow="rateShow" :isFullScreen="isFullScreen" @change="switchRate"></PlayRateList>
+        </view>
+      </ComCoverView>
+      <!-- 全屏 end -->
+
+       
+      <!-- 小屏 start -->
+      <ComCoverView class="" v-if="!isFullScreen">
+        <view class="video-content-box" v-if="!isFullScreen" @tap.stop.prevent="onclick" @longtap.stop.prevent="longtap">
+          <!-- 头部控件区域 -->
+          <view
+            class="video-control-header"
+            v-if="controlsShow && showPlayRate"
+            @tap.stop.prevent="controllerAreaClick"
+            :style="[headerStyle]"
+          >
+            <!-- 返回 -->
+            <view class="back plr-10" @tap.stop.prevent="fullScreen">
+              <text class="iconfont">&#xe600;</text>
+              <text class="back-text">{{videoTitle}}</text>
+            </view>
+            <view class="header-right">
+              <view @tap.stop.prevent="onCollectClick" class="plr-10">
+                <text v-if="isCollect" class="iconfont">&#xe65b;</text>
+                <text v-else class="iconfont">&#xe65a;</text>
+              </view>
+              <view @tap.stop.prevent="onShareClick"><text class="iconfont plr-10">&#xe626;</text></view>
+              <view @tap.stop.prevent="onMoreClick"><text class="iconfont plr-10">&#xe624;</text></view>
+            </view>
+          </view>
+          <!-- 底部控件区域 -->
+          <view
+            class="video-control-footer"
+            v-if="controlsShow && showPlayRate"
+            @tap.stop.prevent="controllerAreaClick"
+            :style="[headerStyle]"
+          >
+            <!-- 播放/暂停 -->
+            <view v-if="playing" class="plr-10" @tap.stop.prevent="pauseVideo" >
+              <text class="iconfont">&#xe633;</text>
+            </view>
+            <view v-else class="plr-10" @tap.stop.prevent="playVideo"><text class="iconfont">&#xe623;</text></view>
+            <!-- 进度条 -->
+            <text class="c-white time">{{ secondToMinute(current) }}</text>
+            <VideoSlider
+              :max="duration"
+              :value="current"
+              :width="sliderWidth"
+              @touchStart="preventHideControl"
+              @change="sliderChange"
+              :backgroundColor="color"
+              :blockColor="color"
+              :isFullScreen="isFullScreen"
+            ></VideoSlider>
+            <text class="c-white time">{{ secondToMinute(duration) }}</text>
+            <!-- <text class="c-white time">{{ secondToMinute(current) }}/{{ secondToMinute(duration) }}</text> -->
+            <view class="pl-10 " @tap.stop.prevent="rateShowClick" v-if="showPlayRate">
+              <text class="c-white font-size">倍数</text>
+            </view>
+            <!-- 全屏 -->
+            <view class="plr-10" @tap.stop.prevent="enterFullScreen"><text class="iconfont">&#xe62b;</text></view>
+          </view>
+          
+          <PlayRateList :currentRate="currentRate" :rateShow="rateShow" :isFullScreen="isFullScreen" @change="switchRate"></PlayRateList>
+        </view>
+      </ComCoverView>
+      <!-- 小屏 end -->
+      
+    </video>
+  </view>
+</template>
+
+<script>
+import VideoSlider from './components/video-slider/video-slider.nvue'
+import ComCoverView from './components/com-cover-view/com-cover-view.vue'
+import PlayRateList from './components/play-rate-list/play-rate-list.vue'
+
+let timer
+const systemInfo = uni.getSystemInfoSync()
+const maxWidth = Math.max(systemInfo.windowWidth, systemInfo.windowHeight)
+const minWidth = Math.min(systemInfo.windowWidth, systemInfo.windowHeight)
+
+export default {
+  emits: ['click'],
+  name: 'FVideoPlayer',
+  components: {
+    VideoSlider,
+    ComCoverView,
+    PlayRateList
+  },
+  props: {
+    videoTitle: {
+      type: [String],
+      default: '视频标题',
+      desc: '标题'
+    },
+    src: {
+      type: [String],
+      default: ''
+    },
+    initialTime: {
+      type: [Number, String],
+      default: 0
+    },
+    xWebkitAirplay: {
+      type: [String],
+      default: ''
+    },
+    poster: {
+      type: [String],
+      default: ''
+    },
+    autoPlay: {
+      type: [Boolean],
+      default: false
+    },
+    controls: {
+      type: [Boolean],
+      default: true
+    },
+    showPlayRate: {
+      type: [Boolean],
+      default: true,
+      desc: '全屏时是否显示倍数'
+    },
+    fullScreenPadding: {
+      type: [Number, String],
+      default: 40
+    },
+    longTapSpeed: {
+      type: [Number, String],
+      default: 1.5
+    },
+    showBarrage: {
+      type: [Boolean],
+      default: true,
+      desc: '弹幕是否开启'
+    },
+    enableProgressGesture: {
+      type: [Boolean],
+      default: true
+    },
+    showCenterPlayBtn: {
+      type: [Boolean],
+      default: false
+    },
+    showDownload: {
+      type: [Boolean],
+      default: false
+    },
+    isCollect: {
+      type: [Boolean],
+      default: false
+    },
+    dragSliderAutoPlay: {
+      type: [Boolean],
+      default: false
+    },
+  },
+  data() {
+    return {
+      videoContext: '',
+      isLongTap: false,
+      isLocked: false,
+      rateShow: false,
+      isOpenBarrage: false,
+      controlsShow: true,
+      videoCurrentTime: 0,
+      videoPreTime: 0,
+      currentRate: 1,
+      playing: false,
+      isFullScreen: false,
+      color: '#ffffff',
+      duration: 100,
+      current: 0,
+      padding: 0
+    }
+  },
+  computed: {
+    safePadding() {
+      return this.fullScreenPadding > this.padding ? this.fullScreenPadding : this.padding
+    },
+    sliderWidth() {
+      let width = minWidth - 160 - (this.safePadding * 2)
+      if (this.isFullScreen) {
+        width = maxWidth + 1  - 80 - (this.safePadding * 2)
+      }
+      return width
+    },
+    lockStyle() {
+      let style = { left: 0 }
+      if (this.isFullScreen) {
+        style = { left: this.safePadding + 'px' }
+      }
+      return style
+    },
+    headerStyle() {
+      let style = {
+        height: '45px',
+        'padding-left': '10px',
+        'padding-right': '10px'
+      }
+      if (this.isFullScreen) {
+        style = {
+          'padding-left': this.safePadding + 'px',
+          'padding-right': this.safePadding + 'px',
+          height: 45 + systemInfo.statusBarHeight + 'px',
+          'padding-top': systemInfo.statusBarHeight + 'px'
+        }
+      }
+      
+      return style
+    },
+    fullScreenFooterStyle() {
+      const style ={
+        ...this.footerStyle
+      }
+      style.height = '100px'
+      return style
+    },
+    footerStyle() {
+      let style = { 'padding-left': '10px', 'padding-right': '10px' }
+      if (this.isFullScreen) {
+        style = {
+          'padding-left': this.safePadding + 'px',
+          'padding-right': this.safePadding + 'px',
+          'padding-bottom': '40px',
+          height: '80px'
+        }
+      }
+      return style
+    }
+  },
+  beforeCreate() {
+    // #ifdef APP-NVUE
+    let domModule = weex.requireModule('dom')
+    domModule.addRule('fontFace', {
+      fontFamily: 'fvideoplayicon',
+      // src: "url('local://fvideoplayicon.ttf')",
+      src: "url('https://at.alicdn.com/t/c/font_3930558_la1ub4ar8w.ttf?t=1677858846586')"
+    })
+    // #endif
+  },
+  mounted() {
+    this.videoContext = uni.createVideoContext('myVideo111', this)
+    this.padding = (systemInfo.screenHeight - systemInfo.safeArea.height) / 2
+  },
+  unmounted() {},
+  methods: {
+    longtap(event){
+      event.stopPropagation()
+      this.preventHideControl()
+      
+      const longTapSpeed = parseFloat(this.longTapSpeed)
+      if( [0.5,0.8,1.0,1.25,1.5,2].includes(longTapSpeed)){
+        this.isLongTap = true
+        this.videoContext.playbackRate(longTapSpeed)
+      }
+    },
+    onDanMuFocus(event) {
+      console.log('==== onDanMuFocus :', event);
+      this.preventHideControl()
+    },
+    keyboardHeightChangeListener(event) {
+      console.log('==== keyboardHeightChangeListener :', event);
+      if(event.inoutId) {
+        // 点击输入
+        this.preventHideControl()
+        return
+      }
+      
+      // 隐藏输入
+      this.hideControl()
+    },
+    secondToMinute(second) {
+      let sec = Math.floor(second % 60)
+      let minute = Math.floor(second / 60)
+
+      return `${minute < 10 ? '0' + minute : minute}:${sec < 10 ? '0' + sec : sec}`
+    },
+    loadedmetadata(event) {
+      this.duration = event.target.duration
+      
+      const initialTime = parseInt(this.initialTime)
+      if(initialTime && !isNaN(initialTime)){
+        this.current = initialTime;
+        this.videoContext.seek(this.current);
+      }
+      
+      this.$emit('loadedmetadata', event)
+    },
+    progress(event) {
+      console.log('==== event :', event)
+      // event.target.buffered
+    },
+    onCollectClick(e) {
+      e.stopPropagation()
+      this.$emit('collect', this.isCollect)
+    },
+    onMoreClick(e) {
+      e.stopPropagation()
+      this.$emit('more')
+    },
+    onShareClick(e) {
+      e.stopPropagation()
+      this.$emit('share')
+    },
+    
+    onclick(e) {
+      if (this.isLongTap) {
+        this.isLongTap = false
+        this.videoContext.playbackRate(this.currentRate)
+        console.log('onclick: ', e)
+        return
+      }
+      
+      if (e.currentTarget.event) {
+        this.hideControl()
+        return
+      }
+
+      if (this.controlsShow) {
+        this.hideControl(0)
+      } else {
+        this.controlsShow = !this.controlsShow
+        this.hideControl()
+      }
+    },
+    stopPropagation(e) {
+      e.stopPropagation()
+    },
+    //拖动滑块
+    sliderChange(e) {
+      this.current = e.detail.value
+      this.videoContext.seek(this.current)
+      this.hideControl(3000)
+      
+      // 自动播放
+      this.playVideo()
+    },
+    hideControl(time = 5000) {
+      console.log('time: ', time)
+      if (timer) {
+        clearTimeout(timer)
+      }
+      timer = setTimeout(() => {
+        this.controlsShow = false
+        this.rateShow = false
+      }, time)
+    },
+    preventHideControl() {
+      clearTimeout(timer)
+    },
+    lockClick(e) {
+      e.stopPropagation()
+      this.isLocked = !this.isLocked
+      if (this.isLocked) {
+        this.hideControl(1500)
+      } else {
+        this.hideControl()
+      }
+    },
+    rateShowClick(e) {
+      e.stopPropagation()
+      this.rateShow = true
+      clearTimeout(timer)
+    },
+    controllerAreaClick(e) {
+      e.stopPropagation()
+      this.hideControl(3000)
+    },
+    playVideo(e) {
+      e?.stopPropagation()
+      this.videoContext.play()
+      this.playing = true
+      this.hideControl(3000)
+    },
+    pauseVideo(e) {
+      e.stopPropagation()
+      this.videoContext.pause()
+      this.playing = false
+      this.hideControl(3000)
+    },
+    // 视频被播放
+    play() {
+      this.playing = true
+      this.$emit('play', this.videoCurrentTime)
+    },
+    // 视频播放结束
+    ended() {
+      this.playing = false
+      this.$emit('ended', this.videoCurrentTime)
+    },
+    // 暂停视频播放
+    pause() {
+      this.playing = false
+      this.$emit('pause', this.videoCurrentTime)
+    },
+    switchRate(rate) {
+      this.currentRate = rate
+      this.rateShow = false
+      this.videoContext.playbackRate(rate)
+    },
+    timeupdate(res) {
+      this.$emit('timeupdate', res)
+      let time = res.detail.currentTime
+
+      const timeDeff = time - this.videoCurrentTime
+      // 小于当前历史播放时间
+      if (timeDeff <= 0) {
+        return
+      }
+
+      this.current = time
+
+      // 拖拽时间超出当前时间  + 1currentRate秒 播放的内容
+      if (timeDeff > 0 && timeDeff <= this.currentRate) {
+        this.videoCurrentTime = time
+        this.$emit('historyMaxPlayPosition', time)
+        this.$emit('input', time)
+        return
+      }
+
+      // 能拖拽
+      if (this.enableProgressGesture) return
+      //  拖拽时间超出当前时间 过多 回到当前播放时间
+      if (timeDeff > this.currentRate) {
+        this.videoContext.seek(this.videoCurrentTime)
+        return
+      }
+    },
+    enterFullScreen(e) {
+      e.stopPropagation()
+      this.videoContext.requestFullScreen()
+      const tempTimer = setTimeout(() => {
+        this.isFullScreen = true
+        clearTimeout(tempTimer)
+      }, 50);
+    },
+    exitFullScreen(e) {
+      e.stopPropagation()
+      this.isFullScreen = false
+      this.videoContext.exitFullScreen()
+    },
+    controlstoggle(event) {
+      // this.controlsShow = event.detail.show
+      // console.log('controlstoggle onclick: ', event.detail.show)
+      // this.rateShow = false
+    }
+  }
+
+}
+</script>
+
+<style scoped lang="scss">
+/* #ifndef APP-NVUE */
+view,
+cover-view {
+  box-sizing: border-box;
+}
+/* #endif */
+
+.flex-1 {
+  flex: 1;
+}
+
+.cover-view {
+  color: #fff;
+  flex: 1;
+  /* #ifndef APP-PLUS-NVUE */
+  display: flex;
+  height: 100%;
+  /* #endif*/
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.c-white {
+  color: white;
+}
+
+.time {
+  font-size: 12px;
+}
+
+.myVideo-slot-box {
+  width: 100%;
+  height: 100%;
+}
+
+.video-content-box {
+  color: #fff;
+  flex: 1;
+  /* #ifndef APP-PLUS-NVUE */
+  display: flex;
+  height: 100%;
+  /* #endif*/
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 999;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  position: absolute;
+}
+
+.input {
+  background-color: #c4c4c4;
+  border-radius: 20rpx;
+  color: #222;
+  padding: 0 20rpx;
+}
+
+.lock {
+  position: absolute;
+  left: 20rpx;
+  padding: 10px;
+  border-radius: 50%;
+  background-color: rgba(1, 1, 1, 0.5);
+  opacity: 1;
+}
+
+.f-center{
+  /* #ifndef APP-PLUS-NVUE */
+  display: flex;
+  /* #endif*/
+  align-items: center;
+  justify-content: center;
+}
+.wh-40{
+  width: 40px;
+  height: 40px;
+}
+/* #ifndef APP-PLUS-NVUE */
+@font-face {
+  font-family: 'fvideoplayicon';
+  src: url('fvideoplayicon.ttf') format('truetype');
+}
+/* #endif*/
+.iconfont {
+  color: #ffffff;
+  font-family: fvideoplayicon !important;
+  /* #ifndef APP-PLUS-NVUE */
+  font-family: 'fvideoplayicon' !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* #endif*/
+  font-style: normal;
+  font-size: 20px;
+
+}
+
+.mr-10 {
+  margin-right: 10px;
+}
+
+.ml-12 {
+  margin-left: 12px;
+}
+
+.plr-10 {
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.pr-20 {
+  padding-right: 20px;
+}
+
+.font-size {
+  font-size: 14px;
+}
+
+.video-wrap {
+  height: 400rpx;
+  position: relative;
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
+  flex-direction: row;
+  flex: 1;
+}
+
+.video {
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
+  flex-direction: row;
+  position: relative;
+  flex: 1;
+}
+
+.video-control-header {
+  /* #ifndef APP-NVUE */
+  display: flex;
+  overflow: hidden;
+  /* #endif */
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 90rpx;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(1, 1, 1, 0.5);
+}
+
+.header-right {
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  width: 300rpx;
+  flex: 2;
+}
+
+.back {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  /* #ifndef APP-NVUE */
+  word-break: break-all;
+  /* #endif */
+  .back-text {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    color: #fff;
+    width: 100px;
+    height: 20px;
+    overflow:hidden;
+    line-height:  20px;
+    /* #ifndef APP-NVUE */
+    white-space:nowrap;
+    /* #endif */
+  }
+}
+
+.flex-row-sb {
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.video-control-footer {
+  z-index: 99;
+  background-color: rgba(1, 1, 1, 0.5);
+  height: 90rpx;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* #ifndef APP-NVUE */
+  display: flex;
+  /* #endif */
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.video-control-footer-fullscreen {
+  flex-direction: column;
+  height: 120rpx;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.play-rate-list {
+  width: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: width 0.3s ease;
+  background-color: rgba(0, 0, 0, 0.65);
+  z-index: 999;
+}
+
+.play-rate-item {
+  transition: color ease 0.3s;
+  height: 20px;
+}
+
+.rate-text {
+  text-align: center;
+}
+
+.rate-text-full-screen {
+  line-height: 80px;
+}
+
+.rate-show {
+  width: 200px;
+}
+
+.rate-active {
+  color: #00d8ff;
+}
+</style>
