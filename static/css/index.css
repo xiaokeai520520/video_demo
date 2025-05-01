@@ -167,14 +167,6 @@
   color: var(--ph-text-color);
 }
 
-.ph-menu-badge {
-  background-color: var(--ph-orange);
-  color: var(--ph-black);
-  font-size: 22rpx;
-  font-weight: bold;
-  padding: 4rpx 12rpx;
-  border-radius: 6rpx;
-}
 
 .ph-menu-flag {
   font-size: 36rpx;
@@ -218,42 +210,6 @@
 .ph-banner image {
   width: 100%;
   height: 100%;
-}
-
-/* 分类导航 */
-.ph-categories {
-  height: 80rpx;
-  white-space: nowrap;
-  background-color: var(--ph-black);
-  border-bottom: 1px solid var(--ph-dark-gray);
-  margin-bottom: 20rpx;
-}
-
-.ph-category-item {
-  display: inline-block;
-  padding: 0 20rpx;
-  height: 80rpx;
-  line-height: 80rpx;
-  font-size: 28rpx;
-  color: var(--ph-text-secondary);
-  position: relative;
-}
-
-.ph-category-item.active {
-  color: var(--ph-orange);
-  font-weight: bold;
-}
-
-.ph-category-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40rpx;
-  height: 4rpx;
-  background-color: var(--ph-orange);
-  border-radius: 2rpx;
 }
 
 /* 区块标题 */
