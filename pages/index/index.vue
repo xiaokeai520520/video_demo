@@ -41,11 +41,32 @@
 					<view class="ph-menu-text">美国 中最热</view>
 					<view class="ph-menu-flag">🇺🇸</view>
 				</view>
+				<view class="ph-menu-category">
+					<view class="ph-menu-item" @click="toggleCategory('hotCategory')">
+						<view class="ph-menu-icon">🎬</view>
+						<view class="ph-menu-text">热门类别</view>
+						<view class="ph-menu-arrow" :class="{ 'rotated': categoryOpen.hotCategory }">▼</view>
+					</view>
 
-				<view class="ph-menu-item">
-					<view class="ph-menu-icon">⭐</view>
-					<view class="ph-menu-text">色情明星和模特</view>
-					<view class="ph-menu-arrow">▼</view>
+					<!-- 子菜单内容 - 可折叠部分 -->
+					<view class="ph-submenu" :class="{ 'open': categoryOpen.hotCategory }">
+						<view class="ph-submenu-item">
+							<view class="ph-submenu-icon">📹</view>
+							<view class="ph-submenu-text">青少年</view>
+						</view>
+						<view class="ph-submenu-item">
+							<view class="ph-submenu-icon">📹</view>
+							<view class="ph-submenu-text">辣妈</view>
+						</view>
+						<view class="ph-submenu-item">
+							<view class="ph-submenu-icon">📹</view>
+							<view class="ph-submenu-text">女性之选</view>
+						</view>
+						<view class="ph-all-categories" @click="viewAllCategories">
+							<text>所有分类</text>
+						</view>
+						<!-- 更多分类... -->
+					</view>
 				</view>
 			</view>
 		</view>
@@ -54,7 +75,8 @@
 		<view class="ph-overlay" :class="{ 'active': sidebarOpen }" @click="closeSidebar"></view>
 
 		<!-- 滚动内容区域 -->
-		<scroll-view scroll-y="true" class="ph-content">
+		<scroll-view scroll-y="true" class="ph-content" show-scrollbar="false" enable-back-to-top="true"
+			refresher-enabled="false" bounces="true">
 			<!-- 横幅广告 -->
 			<view class="ph-banner">
 				<image src="https://placehold.co/800x100/333/ffffff?text=Banner" mode="aspectFill"></image>
@@ -130,13 +152,13 @@
 			</view>
 
 			<!-- 热门模特 -->
-			<view class="ph-section-header">
+			<!-- <view class="ph-section-header">
 				<view class="ph-section-title">推荐频道</view>
 				<view class="ph-section-more">更多 ></view>
-			</view>
+			</view> -->
 
 			<!-- 模特列表 -->
-			<view class="ph-model-list">
+			<!-- <view class="ph-model-list">
 				<view class="ph-model-item" v-for="(item, index) in models" :key="index">
 					<view class="ph-model-avatar">
 						<image :src="`https://placehold.co/100x100/333/ffffff?text=Channel+${index+1}`"
@@ -150,7 +172,7 @@
 						<text>订阅</text>
 					</view>
 				</view>
-			</view>
+			</view> -->
 
 			<!-- 底部区域 -->
 			<view class="ph-footer">
@@ -197,6 +219,12 @@
 	// 侧边栏状态
 	const sidebarOpen = ref(false);
 
+	// 新增：分类菜单展开/折叠状态
+	const categoryOpen = ref({
+		hotCategory: false,
+		// 您可以添加更多分类
+	});
+
 	// 切换侧边栏
 	const toggleSidebar = () => {
 		sidebarOpen.value = !sidebarOpen.value;
@@ -205,6 +233,11 @@
 	// 关闭侧边栏
 	const closeSidebar = () => {
 		sidebarOpen.value = false;
+	};
+
+	// 新增：切换分类折叠/展开
+	const toggleCategory = (category) => {
+		categoryOpen.value[category] = !categoryOpen.value[category];
 	};
 
 	// 热门视频数据

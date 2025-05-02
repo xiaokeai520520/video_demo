@@ -15,6 +15,8 @@
 <style>
 	/* 导入首页样式 */
 	@import './static/css/index.css';
+	/* 导入视频页面样式 */
+	@import './static/css/video.css';
 
 	/* 基础样式 */
 	page {

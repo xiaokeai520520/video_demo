@@ -9,7 +9,27 @@
           "titleNView": false
         }
       }
-    }
+    },
+	{
+	  "path": "pages/video/detail",
+	  "style": {
+	    "navigationBarTitleText": "视频站",
+	    "navigationStyle": "custom",
+	    "app-plus": {
+	      "titleNView": false
+	    }
+	  }
+	},
+	{
+	  "path": "pages/video/short",
+	  "style": {
+	    "navigationBarTitleText": "视频站",
+	    "navigationStyle": "custom",
+	    "app-plus": {
+	      "titleNView": false
+	    }
+	  }
+	}
   ],
   "globalStyle": {
     "navigationBarTextStyle": "white",
