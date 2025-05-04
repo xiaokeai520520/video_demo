@@ -2,67 +2,44 @@ import {
 	createSSRApp
 } from 'vue'
 import App from './App.vue'
-import './mock' // 引入mock数据
+import './mock'
 import TkLoading from '@/components/TikTokLoading.vue'
-import PornModal from '@/components/PornModal.vue'
+import {
+	initBaseUrls
+} from '@/utils/url-checker'
 
-// 创建全局 Modal 服务
-const modalService = {
-	_instance: null,
-
-	// 初始化Modal实例(在App加载后调用)
-	init(instance) {
-		this._instance = instance;
-	},
-
-	// 显示弹窗方法
-	show(options) {
-		if (this._instance) {
-			this._instance.open(options);
-		} else {
-			// 回退到系统弹窗
-			uni.showModal(options);
-		}
-	}
+const globalData = {
+	baseUrls: null
 };
 
-// 创建全局 Loading 服务
-const loadingService = {
-	_instance: null,
-
-	// 初始化Loading实例
-	init(instance) {
-		this._instance = instance;
-	},
-
-	// 显示加载
-	show(text = '加载中...') {
-		if (this._instance) {
-			this._instance.isLoading = true;
-			this._instance.text = text;
-		}
-	},
-
-	// 隐藏加载
-	hide() {
-		if (this._instance) {
-			this._instance.isLoading = false;
-		}
-	}
-};
+// 初始化URL（立即开始异步加载）
+initBaseUrls().then(urls => {
+	globalData.baseUrls = urls;
+	console.log('URL初始化成功:', urls);
+}).catch(error => {
+	console.error('URL初始化失败:', error);
+	// 设置默认值或显示错误
+	globalData.baseUrls = null;
+});
 
 export function createApp() {
-	const app = createSSRApp(App)
+	const app = createSSRApp(App);
 
 	// 注册全局组件
-	app.component('TkLoading', TkLoading)
-	app.component('PornModal', PornModal)
+	app.component('TkLoading', TkLoading);
 
-	// 添加全局属性
-	app.config.globalProperties.$modal = modalService
-	app.config.globalProperties.$loading = loadingService
+	// 将baseUrls添加为全局属性
+	app.config.globalProperties.$baseUrls = globalData.baseUrls;
+
+	// 添加自定义的模态框服务
+	app.config.globalProperties.$modal = {
+		show(options) {
+			uni.showModal(options);
+		}
+	};
 
 	return {
-		app
+		app,
+		globalData // 导出全局数据，可通过getApp().globalData访问
 	}
 }

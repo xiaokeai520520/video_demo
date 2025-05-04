@@ -31,64 +31,86 @@ const checkUrl = (url) => {
 	return new Promise((resolve) => {
 		// 设置超时时间较短，防止长时间等待
 		const timeout = 5000;
-		const startTime = Date.now();
-
-		// 添加时间戳防止缓存
-		const timestamp = new Date().getTime();
-		const testUrl = url.includes('?') ?
-			`${url}&_t=${timestamp}` :
-			`${url}?_t=${timestamp}`;
+		
+		// 构建测试URL - 使用testurl.php端点
+		const testEndpoint = `${url}/testurl.php`;
 
 		uni.request({
-			url: testUrl,
+			url: testEndpoint,
 			timeout: timeout,
-			success: () => {
-				// 成功访问，记录耗时
-				const responseTime = Date.now() - startTime;
-				resolve({
-					url, // 返回原始URL，不包含时间戳
-					available: true,
-					responseTime
-				});
+			success: (res) => {
+				// 判断返回内容是否为"success"
+				if (res.statusCode === 200 && res.data === 'success') {
+					resolve({
+						url: url, // 返回原始URL
+						available: true
+					});
+				} else {
+					resolve({
+						url: url,
+						available: false,
+						reason: '返回内容不是success'
+					});
+				}
 			},
-			fail: () => {
+			fail: (err) => {
 				resolve({
-					url, // 返回原始URL，不包含时间戳
+					url: url,
 					available: false,
-					responseTime: timeout
+					reason: err.errMsg || '请求失败'
 				});
 			}
 		});
 	});
 };
-
 // 检测URL数组中的所有URL，返回第一个可用的
 const findFirstAvailableUrl = async (urlArray) => {
-	if (!urlArray || !urlArray.length) {
-		return null;
-	}
-
-	// 同时检测所有URL
-	const checkPromises = urlArray.map(url => checkUrl(url));
-
-	// 使用Promise.race获取第一个成功的结果
-	try {
-		// 等待所有检测完成
-		const results = await Promise.all(checkPromises);
-
-		// 过滤出可用的URL并按响应时间排序
-		const availableUrls = results
-			.filter(result => result.available)
-			.sort((a, b) => a.responseTime - b.responseTime);
-
-		// 返回响应最快的URL
-		return availableUrls.length > 0 ? availableUrls[0].url : null;
-	} catch (error) {
-		console.error('检测URL出错:', error);
-		return null;
-	}
+    if (!urlArray || !urlArray.length) {
+        return null;
+    }
+    
+    // 使用Promise.race来获取第一个成功的结果
+    try {
+        // 创建一个可以单独处理每个URL检测结果的函数
+        const checkUrlAndReturn = async (url) => {
+            const result = await checkUrl(url);
+            // 如果URL可用，直接返回
+            if (result.available) {
+                return result.url;
+            }
+            // 如果不可用，抛出错误以便继续检查下一个
+            throw new Error(`URL ${url} 不可用: ${result.reason}`);
+        };
+        
+        // 使用Promise.any获取第一个成功的结果
+        // 如果浏览器不支持Promise.any，可以改用Promise.race和一些额外处理
+        try {
+            // 尝试使用Promise.any (较新的浏览器支持)
+            return await Promise.any(urlArray.map(url => checkUrlAndReturn(url)));
+        } catch {
+            // 回退方案：手动实现类似Promise.any的功能
+            let lastError = null;
+            for (const url of urlArray) {
+                try {
+                    const result = await checkUrl(url);
+                    if (result.available) {
+                        console.log('找到第一个可用URL:', url);
+                        return url;
+                    }
+                    lastError = `URL ${url} 不可用: ${result.reason}`;
+                } catch (err) {
+                    lastError = err;
+                }
+            }
+            // 所有URL都不可用
+            console.error('所有URL均不可用，最后错误:', lastError);
+            return null;
+        }
+    } catch (error) {
+        console.error('URL检测过程出错:', error);
+        return null;
+    }
 };
-
 // 初始化所有URL并获取可用的基础URL
 const initBaseUrls = async () => {
 	try {
@@ -102,9 +124,15 @@ const initBaseUrls = async () => {
 
 		// 检测API URL
 		const availableApiUrl = await findFirstAvailableUrl(api_url);
+		console.log('可用的API URL:', availableApiUrl);
 
 		// 检测视频 URL
 		const availableVideoUrl = await findFirstAvailableUrl(video_url);
+		console.log('可用的视频 URL:', availableVideoUrl);
+
+		// 检测错误报告 URL
+		const availableErrorUrl = await findFirstAvailableUrl(error_url);
+		console.log('可用的错误报告 URL:', availableErrorUrl);
 
 		// 如果API和视频URL都不可用，使用错误URL
 		if (!availableApiUrl && !availableVideoUrl) {

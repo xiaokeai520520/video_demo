@@ -1,17 +1,13 @@
 {
 	"api_url": [
-		"https://api1.example.com",
-		"https://api2.example.com",
-		"https://api-backup.example.com"
+		"https://wap2.tycms881.vip",
+		"https://wap2.tycms883.vip"
 	],
 	"video_url": [
-		"https://video1.example.com",
-		"https://video2.example.com",
-		"https://video-cdn.example.com"
+		"https://cdn.ty1919.top"
 	],
 	"error_url": [
-		"https://error-report.example.com",
-		"https://monitor.example.com"
+		"https://wap.tycms881.vip"
 	],
 	"app_version": "1.0.0",
 	"app_name": "视频应用"
