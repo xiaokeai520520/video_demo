@@ -1,0 +1,18 @@
+{
+	"api_url": [
+		"https://api1.example.com",
+		"https://api2.example.com",
+		"https://api-backup.example.com"
+	],
+	"video_url": [
+		"https://video1.example.com",
+		"https://video2.example.com",
+		"https://video-cdn.example.com"
+	],
+	"error_url": [
+		"https://error-report.example.com",
+		"https://monitor.example.com"
+	],
+	"app_version": "1.0.0",
+	"app_name": "视频应用"
+}
