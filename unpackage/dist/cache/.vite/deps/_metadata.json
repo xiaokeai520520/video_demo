@@ -1,13 +1,13 @@
 {
-  "hash": "1bb2309c",
-  "configHash": "6dfa9a3a",
+  "hash": "d68b2e1c",
+  "configHash": "3cccd3e5",
   "lockfileHash": "3dae80a9",
-  "browserHash": "9dde5e4c",
+  "browserHash": "d9e60d93",
   "optimized": {
     "mockjs": {
       "src": "../../../../../node_modules/mockjs/dist/mock.js",
       "file": "mockjs.js",
-      "fileHash": "3d12a8af",
+      "fileHash": "6ed33581",
       "needsInterop": true
     }
   },

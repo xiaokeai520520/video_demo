@@ -3,9 +3,9 @@ var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
 
-// ../../../../../../Users/xin/Sites/2025/uniapp_uni_ui/uniapp_uni_ui/node_modules/mockjs/dist/mock.js
+// ../../../../../../Users/xin/Sites/2025/video_demo/node_modules/mockjs/dist/mock.js
 var require_mock = __commonJS({
-  "../../../../../../Users/xin/Sites/2025/uniapp_uni_ui/uniapp_uni_ui/node_modules/mockjs/dist/mock.js"(exports, module) {
+  "../../../../../../Users/xin/Sites/2025/video_demo/node_modules/mockjs/dist/mock.js"(exports, module) {
     (function webpackUniversalModuleDefinition(root, factory) {
       if (typeof exports === "object" && typeof module === "object")
         module.exports = factory();
