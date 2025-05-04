@@ -12,7 +12,7 @@
 			return {}
 		},
 		onLoad() {
-			console.log('页面加载');
+			console.log('首页加载完成');
 		}
 	}
 </script>

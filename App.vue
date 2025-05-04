@@ -1,54 +1,65 @@
 <template>
-	<view>
-		<view v-if="initializing" class="init-loading">
-			<TkLoading :isLoading="true" text="正在连接服务器..."></TkLoading>
+	<view class="app-container">
+		<view class="fixed-loading">
+			<TikTokLoading text="正在连接服务器..."></TikTokLoading>
 		</view>
-		<view v-else>
-			<!-- 这里是应用的主内容区域 -->
-			<view>
-				<slot></slot>
-			</view>
-		</view>
+		<slot></slot>
 	</view>
 </template>
 
 <script>
-	import TkLoading from '@/components/TikTokLoading.vue';
+	import TikTokLoading from '@/components/TikTokLoading.vue';
+	import http from '@/utils/request';
 
 	export default {
 		components: {
-			TkLoading,
+			TikTokLoading
 		},
 		data() {
 			return {
-				initializing: true, // 初始化标志
-				checkUrlInterval: null
+				urlsInitialized: false
 			}
 		},
 		onLaunch() {
-			console.log('App Launch');
-			// 开始检查URL是否已初始化
-			this.checkUrlInitialization();
+			console.log('App.vue 加载完成');
+			this.initializeUrls();
 		},
 		methods: {
-			checkUrlInitialization() {
-				// 创建一个轮询，检查URL是否初始化完成
-				this.checkUrlInterval = setInterval(() => {
+			async initializeUrls() {
+				try {
+					// 检查全局数据中是否已有初始化结果
 					const app = getApp();
 					if (app && app.globalData && app.globalData.baseUrls) {
-						// URL已初始化，结束加载状态
-						this.initializing = false;
-						clearInterval(this.checkUrlInterval);
-						console.log('URL初始化完成，应用已就绪');
+						this.urlsInitialized = true;
+						return;
 					}
-				}, 200);
-			}
-		},
-		beforeDestroy() {
-			// 清除所有定时器
-			if (this.checkUrlInterval) {
-				clearInterval(this.checkUrlInterval);
+
+					// 没有初始化结果，主动初始化
+					await http.init();
+					this.urlsInitialized = true;
+				} catch (error) {
+					console.error('URL初始化失败:', error);
+					// 可以添加重试逻辑
+					setTimeout(() => {
+						this.initializeUrls();
+					}, 3000);
+				}
 			}
 		}
 	}
 </script>
+
+<style>
+	.init-loading {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: #fff;
+		z-index: 9999;
+	}
+</style>

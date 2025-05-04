@@ -3,33 +3,19 @@ import {
 } from 'vue'
 import App from './App.vue'
 import './mock'
-import TkLoading from '@/components/TikTokLoading.vue'
-import {
-	initBaseUrls
-} from '@/utils/url-checker'
+import http from '@/utils/request'
 
 const globalData = {
-	baseUrls: null
+	baseUrls: null,
+	initializing: true // 添加初始化状态
 };
-
-// 初始化URL（立即开始异步加载）
-initBaseUrls().then(urls => {
-	globalData.baseUrls = urls;
-	console.log('URL初始化成功:', urls);
-}).catch(error => {
-	console.error('URL初始化失败:', error);
-	// 设置默认值或显示错误
-	globalData.baseUrls = null;
-});
 
 export function createApp() {
 	const app = createSSRApp(App);
 
-	// 注册全局组件
-	app.component('TkLoading', TkLoading);
-
-	// 将baseUrls添加为全局属性
-	app.config.globalProperties.$baseUrls = globalData.baseUrls;
+	// 将http服务和globalData挂载到全局
+	app.config.globalProperties.$http = http;
+	app.config.globalProperties.$globalData = globalData;
 
 	// 添加自定义的模态框服务
 	app.config.globalProperties.$modal = {
@@ -38,8 +24,23 @@ export function createApp() {
 		}
 	};
 
+	// 初始化HTTP服务 (只调用一次)
+	http.init().then(urls => {
+		globalData.baseUrls = urls;
+		globalData.initializing = false; // 正确更新全局状态
+		console.log('URL初始化成功:', urls);
+	}).catch(error => {
+		console.error('URL初始化失败:', error);
+		globalData.initializing = false; // 正确更新全局状态
+		uni.showToast({
+			title: '无法连接到服务器，请检查网络',
+			icon: 'none',
+			duration: 3000
+		});
+	});
+
 	return {
 		app,
-		globalData // 导出全局数据，可通过getApp().globalData访问
+		globalData
 	}
 }

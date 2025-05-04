@@ -16,7 +16,7 @@ const TIMEOUT = 60000; // 默认60秒
 
 // 初始化请求服务
 const initRequestService = async () => {
-	if (isInitialized) {
+	if (isInitialized && BASE_URLS.apiBaseUrl) {
 		return BASE_URLS;
 	}
 
@@ -117,10 +117,10 @@ const showError = (message) => {
 	});
 };
 
-// 创建请求方法
-const request = async (options) => {
+// 创建通用请求方法
+const createRequest = (useVideoUrl = false) => async (options) => {
 	// 确保BASE_URL已初始化
-	if (!isInitialized) {
+	if (!isInitialized || (!BASE_URLS.apiBaseUrl && !useVideoUrl) || (!BASE_URLS.videoBaseUrl && useVideoUrl)) {
 		try {
 			await initRequestService();
 		} catch (error) {
@@ -128,18 +128,18 @@ const request = async (options) => {
 		}
 	}
 
-	// 如果apiBaseUrl为空，返回错误
-	if (!BASE_URLS.apiBaseUrl) {
-		showError('网络连接失败，请检查网络设置');
-		return Promise.reject(new Error('API服务不可用'));
+	// 检查对应的URL是否可用
+	const baseUrl = useVideoUrl ? BASE_URLS.videoBaseUrl : BASE_URLS.apiBaseUrl;
+	if (!baseUrl) {
+		const errorMsg = useVideoUrl ? '视频服务不可用，请稍后再试' : '网络连接失败，请检查网络设置';
+		showError(errorMsg);
+		return Promise.reject(new Error(useVideoUrl ? '视频服务不可用' : 'API服务不可用'));
 	}
 
 	// 合并选项，设置完整URL
 	const config = {
 		...options,
-		url: options.url.startsWith('http') ?
-			options.url :
-			BASE_URLS.apiBaseUrl + options.url,
+		url: options.url.startsWith('http') ? options.url : baseUrl + options.url,
 		timeout: options.timeout || TIMEOUT
 	};
 
@@ -160,62 +160,16 @@ const request = async (options) => {
 				}
 			},
 			fail: (err) => {
-				showError('网络连接失败');
+				showError(useVideoUrl ? '视频服务连接失败' : '网络连接失败');
 				reject(err);
 			}
 		});
 	});
 };
 
-// 视频请求方法（使用videoBaseUrl）
-const videoRequest = async (options) => {
-	// 确保BASE_URL已初始化
-	if (!isInitialized) {
-		try {
-			await initRequestService();
-		} catch (error) {
-			return Promise.reject(error);
-		}
-	}
-
-	// 如果videoBaseUrl为空，返回错误
-	if (!BASE_URLS.videoBaseUrl) {
-		showError('视频服务不可用，请稍后再试');
-		return Promise.reject(new Error('视频服务不可用'));
-	}
-
-	// 合并选项，设置完整URL
-	const config = {
-		...options,
-		url: options.url.startsWith('http') ?
-			options.url :
-			BASE_URLS.videoBaseUrl + options.url,
-		timeout: options.timeout || TIMEOUT
-	};
-
-	// 应用请求拦截器
-	const interceptedConfig = requestInterceptor(config);
-
-	// 返回Promise
-	return new Promise((resolve, reject) => {
-		uni.request({
-			...interceptedConfig,
-			success: (res) => {
-				try {
-					// 应用响应拦截器
-					const result = responseInterceptor(res);
-					resolve(result);
-				} catch (error) {
-					reject(error);
-				}
-			},
-			fail: (err) => {
-				showError('视频服务连接失败');
-				reject(err);
-			}
-		});
-	});
-};
+// 标准请求和视频请求
+const request = createRequest(false);
+const videoRequest = createRequest(true);
 
 // 创建HTTP方法别名
 const http = {

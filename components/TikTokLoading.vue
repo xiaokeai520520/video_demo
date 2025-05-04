@@ -12,7 +12,7 @@
 
 <script>
 	export default {
-		name: 'TkLoading',
+		name: 'TikTokLoading',
 		props: {
 			isLoading: Boolean, // 是否显示加载动画
 			showText: {
@@ -24,6 +24,13 @@
 				default: ''
 			}
 		},
+		created() {
+			console.log('TkLoading组件已创建', this.isLoading);
+		},
+		mounted() {
+			console.log('TkLoading组件已挂载');
+			console.log('DOM元素:', this.$el);
+		}
 	};
 </script>
 
