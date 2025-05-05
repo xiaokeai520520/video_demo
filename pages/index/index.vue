@@ -1,22 +1,25 @@
 <template>
-	<view class="content">
-		<view class="test-container">
-			<button class="action-button">测试自定义弹窗</button>
-		</view>
+	<view class="container">
+		<TikTokLoading :isLoading="true" text="正在连接服务器..."></TikTokLoading>
 	</view>
 </template>
 
 <script>
+	import TikTokLoading from '@/components/TikTokLoading.vue';
 	export default {
-		data() {
-			return {}
+		components: {
+			TikTokLoading
 		},
-		onLoad() {
-			console.log('首页加载完成');
+		data() {
+			return {
+				
+			}
+		},
+		methods: {
+
 		}
 	}
 </script>
 
-<style lang="scss">
-
+<style>
 </style>
