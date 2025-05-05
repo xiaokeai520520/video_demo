@@ -1,45 +1,87 @@
 @import '@/uni_modules/uni-scss/variables.scss';
-// 主色 - 橙色替换蓝色
-$uni-primary: #ff9000;       // 主橙色
-$uni-primary-disable: #ffb866; // 浅橙色
-$uni-primary-light: #ffe0b8;   // 非常浅的橙色
+/**
+ * 这是一个 Pornhub 风格的 uni.scss 主题配置文件
+ * 
+ * 在项目根目录下创建 uni.scss 文件，将此内容复制进去
+ * 或者将这些变量合并到已有的 uni.scss 文件中
+ */
 
-// 辅助色 - 保持原有的成功、警告、错误色调
-$uni-success: #18bc37;
-$uni-success-disable: #8cde9b;
-$uni-success-light: #d1f2d7;
+/* Pornhub风格配色 */
+$ph-black: #000000;
+$ph-dark: #121212;
+$ph-orange: #ff9000;
+$ph-white: #ffffff;
+$ph-grey: #282828;
+$ph-light-grey: #383838;
 
-$uni-warning: #f3a73f;
-$uni-warning-disable: #f9d39f;
-$uni-warning-light: #fdedd9;
+/* 覆盖 uni-ui 默认主题变量 */
+$uni-primary: $ph-orange;
+$uni-primary-disable: rgba(255, 144, 0, 0.4);
+$uni-primary-light: rgba(255, 144, 0, 0.1);
 
-$uni-error: #e43d33;
-$uni-error-disable: #f29e99;
-$uni-error-light: #fad8d6;
+$uni-success: #67C23A;
+$uni-warning: $ph-orange;
+$uni-error: #fa3534;
+$uni-info: #909399;
 
-$uni-info: #8f939c;
-$uni-info-disable: #c7c9ce;
-$uni-info-light: #e9e9eb;
+/* 文字颜色 */
+$uni-text-color: $ph-white;
+$uni-text-color-inverse: $ph-black;
+$uni-text-color-grey: #eeeeee;
+$uni-text-color-placeholder: #808080;
+$uni-text-color-disable: #c0c0c0;
 
-// 中性色 - 调整为更深色调
-$uni-main-color: #ffffff;        // 主要文字 - 白色
-$uni-base-color: #e5e5e5;        // 常规文字 - 浅灰白
-$uni-secondary-color: #a0a0a0;   // 次要文字 - 中灰
-$uni-extra-color: #757575;       // 辅助说明 - 深灰
+/* 背景颜色 */
+$uni-bg-color: $ph-black;
+$uni-bg-color-grey: $ph-dark;
+$uni-bg-color-hover: $ph-grey;
+$uni-bg-color-mask: rgba(0, 0, 0, 0.8);
 
-// 边框颜色 - 调整为深色系
-$uni-border-1: #2a2a2a;
-$uni-border-2: #3a3a3a;
-$uni-border-3: #4a4a4a;
-$uni-border-4: #5a5a5a;
+/* 边框颜色 */
+$uni-border-color: $ph-grey;
 
-// 常规色 - 调整背景为深色
-$uni-black: #000000;
-$uni-white: #ffffff;
-$uni-transparent: rgba($color: #000000, $alpha: 0);
-$uni-bg-color: #121212;        // 主背景色 - 深黑
+/* 尺寸变量 */
+$uni-font-size-sm: 24rpx;
+$uni-font-size-base: 28rpx;
+$uni-font-size-lg: 32rpx;
 
-// 阴影
-$uni-shadow-sm: 0 0 5px rgba($color: #000000, $alpha: 0.5);
-$uni-shadow-base: 0 1px 8px 1px rgba($color: #000000, $alpha: 0.6);
-$uni-shadow-lg: 0px 1px 10px 2px rgba($color: #000000, $alpha: 0.8);
+/* 图片尺寸 */
+$uni-img-size-sm: 40rpx;
+$uni-img-size-base: 52rpx;
+$uni-img-size-lg: 80rpx;
+
+/* Border Radius */
+$uni-border-radius-sm: 4rpx;
+$uni-border-radius-base: 6rpx;
+$uni-border-radius-lg: 12rpx;
+$uni-border-radius-circle: 50%;
+
+/* 水平间距 */
+$uni-spacing-row-sm: 10px;
+$uni-spacing-row-base: 20rpx;
+$uni-spacing-row-lg: 30rpx;
+
+/* 垂直间距 */
+$uni-spacing-col-sm: 8rpx;
+$uni-spacing-col-base: 16rpx;
+$uni-spacing-col-lg: 24rpx;
+
+/* 透明度 */
+$uni-opacity-disabled: 0.3;
+
+/* 文章场景相关 */
+$uni-color-title: $ph-orange;
+$uni-font-size-title: 40rpx;
+$uni-color-subtitle: $ph-white;
+$uni-font-size-subtitle: 36rpx;
+$uni-color-paragraph: $ph-white;
+$uni-font-size-paragraph: 30rpx;
+
+/* 自定义额外变量 */
+$ph-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.5);
+$ph-shadow-base: 0 4px 8px rgba(0, 0, 0, 0.5);
+$ph-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+
+$ph-gradient: linear-gradient(135deg, $ph-orange, darken($ph-orange, 10%));
+$ph-hover-opacity: 0.8;
+$ph-active-opacity: 0.6;

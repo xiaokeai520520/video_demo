@@ -12,12 +12,18 @@
 		}
 	}],
 	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8",
-		"app-plus": {
-			"background": "#efeff4"
-		}
-	}
+		"navigationBarBackgroundColor": "#000000",
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "您的应用名称",
+		"backgroundColor": "#000000"
+	},
+	"tabBar": {
+	    "color": "#ffffff",
+	    "selectedColor": "#ff9000",
+	    "backgroundColor": "#000000",
+	    "borderStyle": "black",
+	    "list": [
+	      // 您的选项卡配置...
+	    ]
+	  }
 }

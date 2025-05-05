@@ -1,0 +1,138 @@
+/* Pornhub 风格主题 - 主要是黑色背景、橙色和白色的组合 */
+
+/* 全局变量定义 */
+:root {
+  /* Pornhub 配色方案 */
+  --ph-black: #000000;
+  --ph-dark: #121212;
+  --ph-orange: #ff9000;
+  --ph-white: #ffffff;
+  --ph-grey: #282828;
+  --ph-light-grey: #383838;
+}
+
+/* 页面背景 */
+page {
+  background-color: var(--ph-black);
+  color: var(--ph-white);
+}
+
+/* 主容器样式 */
+.content {
+  background-color: var(--ph-black);
+}
+
+/* 标题样式 */
+.uni-title, .uni-section-header {
+  color: var(--ph-orange) !important;
+}
+
+/* 文本样式 */
+text, .uni-text {
+  color: var(--ph-white);
+}
+
+/* 按钮样式 */
+.uni-button {
+  background-color: var(--ph-orange) !important;
+  color: var(--ph-black) !important;
+  border: none !important;
+  font-weight: bold;
+}
+
+/* 次要按钮 */
+.uni-button-secondary {
+  background-color: var(--ph-grey) !important;
+  color: var(--ph-white) !important;
+}
+
+/* 输入框样式 */
+.uni-input, .uni-textarea, .uni-easyinput {
+  background-color: var(--ph-light-grey) !important;
+  color: var(--ph-white) !important;
+  border: 1px solid var(--ph-grey) !important;
+}
+
+/* 卡片样式 */
+.uni-card {
+  background-color: var(--ph-dark) !important;
+  border: 1px solid var(--ph-grey) !important;
+}
+
+.uni-card-header {
+  border-bottom: 1px solid var(--ph-grey) !important;
+}
+
+.uni-card-header-title {
+  color: var(--ph-orange) !important;
+}
+
+/* 列表样式 */
+.uni-list, .uni-list-item {
+  background-color: var(--ph-dark) !important;
+  color: var(--ph-white) !important;
+}
+
+.uni-list-item__container:after {
+  background-color: var(--ph-grey) !important;
+}
+
+/* 导航栏样式 */
+.uni-navbar {
+  background-color: var(--ph-black) !important;
+}
+
+.uni-navbar__content, .uni-navbar__header {
+  background-color: var(--ph-black) !important;
+}
+
+.uni-navbar__title {
+  color: var(--ph-orange) !important;
+}
+
+/* 选项卡样式 */
+.uni-tab-bar {
+  background-color: var(--ph-dark) !important;
+}
+
+.uni-tabbar__item--active {
+  color: var(--ph-orange) !important;
+}
+
+/* 弹出层样式 */
+.uni-popup {
+  background-color: var(--ph-dark) !important;
+}
+
+/* 徽标样式 */
+.uni-badge {
+  background-color: var(--ph-orange) !important;
+  color: var(--ph-black) !important;
+}
+
+/* 开关样式 */
+.uni-switch .uni-switch-input.uni-switch-input-checked {
+  background-color: var(--ph-orange) !important;
+  border-color: var(--ph-orange) !important;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ph-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ph-orange);
+  border-radius: 3px;
+}
+
+/* 选中文本样式 */
+::selection {
+  background-color: var(--ph-orange);
+  color: var(--ph-black);
+}

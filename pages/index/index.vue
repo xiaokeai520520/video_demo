@@ -1,19 +1,18 @@
 <template>
-	<view class="container">
-		<TikTokLoading :isLoading="true" text="正在连接服务器..."></TikTokLoading>
+	<view class="page-wrapper">
+		<view class="page-container index-page">
+			<!-- 页面内容 -->
+		</view>
 	</view>
 </template>
 
 <script>
-	import TikTokLoading from '@/components/TikTokLoading.vue';
 	export default {
-		components: {
-			TikTokLoading
-		},
 		data() {
-			return {
-				
-			}
+			return {}
+		},
+		onLoad() {
+
 		},
 		methods: {
 
@@ -21,5 +20,6 @@
 	}
 </script>
 
-<style>
+<style lang="scss">
+	@import '@/styles/pages/index.scss';
 </style>
