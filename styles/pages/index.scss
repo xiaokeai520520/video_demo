@@ -1,15 +1,90 @@
-/* index.scss */
+/* index.scss - Pornhub 风格的首页样式 */
+
 .index-page {
-  /* index 页面特定样式 */
-  .header {
-    /* header 样式 */
+  /* 整体布局 */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: var(--ph-black);
+  height: 100vh;
+  
+  /* 内容区域 */
+  .content-scroll {
+    flex: 1;
+    /* 更新高度计算，考虑顶部安全区域 */
+    height: calc(100vh - 100rpx - 100rpx); /* 基础高度计算 */
+  
+    /* #ifdef APP-PLUS || MP */
+    height: calc(100vh - 100rpx - 100rpx - constant(safe-area-inset-top));
+    height: calc(100vh - 100rpx - 100rpx - env(safe-area-inset-top));
+    /* #endif */
+  
+    width: 100%;
+    /* 添加顶部边距，确保内容不被固定header遮挡 */
+    margin-top: 100rpx;
+  
+    /* #ifdef APP-PLUS || MP */
+    margin-top: calc(100rpx + constant(safe-area-inset-top));
+    margin-top: calc(100rpx + env(safe-area-inset-top));
+    /* #endif */
   }
   
-  .content {
-    /* content 样式 */
+  /* 加载更多区域 */
+  .load-more {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100rpx;
+    margin: 20rpx 0 40rpx;
+    
+    .load-more-text {
+      font-size: 28rpx;
+      color: var(--ph-orange);
+      background-color: rgba(255, 144, 0, 0.1);
+      padding: 15rpx 40rpx;
+      border-radius: 40rpx;
+      border: 1px solid rgba(255, 144, 0, 0.3);
+      
+      &:active {
+        opacity: 0.7;
+      }
+    }
   }
   
-  .footer {
-    /* footer 样式 */
+  /* 视频网格部分通用样式 */
+  .video-grid {
+    padding: 0 20rpx;
+    margin-bottom: 30rpx;
+    
+    &-title {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20rpx;
+      
+      .title-text {
+        font-size: 32rpx;
+        font-weight: bold;
+        color: var(--ph-orange);
+        margin-right: 20rpx;
+      }
+      
+      .title-more {
+        font-size: 24rpx;
+        color: var(--ph-white);
+        opacity: 0.7;
+      }
+    }
+    
+    &-content {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -10rpx;
+    }
   }
+  
+  /* Safe area 适配 */
+  /* #ifdef APP-PLUS || MP */
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+  /* #endif */
 }

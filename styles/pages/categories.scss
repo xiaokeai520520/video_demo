@@ -1,0 +1,155 @@
+.categories-page {
+	/* 页面样式 */
+	
+	.content-scroll {
+		flex: 1;
+		height: calc(100vh - 100rpx - 100rpx); /* 减去顶部导航和底部导航的高度 */
+		width: 100%;
+		/* 添加顶部边距，确保内容不被固定header遮挡 */
+		margin-top: 100rpx;
+		
+		/* #ifdef APP-PLUS || MP */
+		height: calc(100vh - 100rpx - 100rpx - constant(safe-area-inset-top));
+		height: calc(100vh - 100rpx - 100rpx - env(safe-area-inset-top));
+		margin-top: calc(100rpx + constant(safe-area-inset-top));
+		margin-top: calc(100rpx + env(safe-area-inset-top));
+		/* #endif */
+	}
+	
+	/* 分类标题 */
+	.categories-title {
+		padding: 30rpx 20rpx;
+		
+		.title-text {
+			font-size: 36rpx;
+			font-weight: bold;
+			color: var(--ph-orange);
+			display: block;
+			margin-bottom: 10rpx;
+		}
+		
+		.title-desc {
+			font-size: 28rpx;
+			color: rgba(255, 255, 255, 0.7);
+		}
+	}
+	
+	/* 分类列表 */
+	.categories-list {
+		padding: 0 20rpx;
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 40rpx;
+	}
+	
+	.category-item {
+		display: flex;
+		align-items: center;
+		padding: 20rpx 0;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		
+		&:active {
+			background-color: rgba(255, 255, 255, 0.05);
+		}
+	}
+	
+	.category-image-wrapper {
+		width: 120rpx;
+		height: 120rpx;
+		border-radius: 20rpx;
+		overflow: hidden;
+		margin-right: 20rpx;
+	}
+	
+	.category-image {
+		width: 100%;
+		height: 100%;
+	}
+	
+	.category-info {
+		flex: 1;
+	}
+	
+	.category-name {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: var(--ph-white);
+		margin-bottom: 10rpx;
+		display: block;
+	}
+	
+	.category-count {
+		font-size: 24rpx;
+		color: rgba(255, 255, 255, 0.5);
+	}
+	
+	/* 推荐分类 */
+	.recommended-section {
+		margin: 20rpx 0 40rpx;
+	}
+	
+	.section-header {
+		padding: 0 20rpx;
+		margin-bottom: 20rpx;
+	}
+	
+	.section-title {
+		font-size: 32rpx;
+		font-weight: bold;
+		color: var(--ph-orange);
+	}
+	
+	.recommended-scroll {
+		width: 100%;
+		white-space: nowrap;
+	}
+	
+	.recommended-list {
+		display: flex;
+		padding: 0 10rpx;
+	}
+	
+	.recommended-item {
+		display: inline-flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 0 10rpx;
+		width: 160rpx;
+		margin-bottom: 20rpx;
+		
+		&:active {
+			opacity: 0.7;
+		}
+	}
+	
+	.recommended-image-wrapper {
+		width: 140rpx;
+		height: 140rpx;
+		border-radius: 70rpx;
+		overflow: hidden;
+		margin-bottom: 15rpx;
+		border: 2px solid var(--ph-grey);
+	}
+	
+	.recommended-image {
+		width: 100%;
+		height: 100%;
+	}
+	
+	.recommended-name {
+		font-size: 26rpx;
+		color: var(--ph-white);
+		margin-bottom: 6rpx;
+		text-align: center;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		width: 100%;
+	}
+	
+	.recommended-count {
+		font-size: 22rpx;
+		color: rgba(255, 255, 255, 0.5);
+		text-align: center;
+	}
+}

@@ -2,28 +2,84 @@
 	"easycom": {
 		"autoscan": true,
 		"custom": {
-			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+			"^ph-(.*)": "@/components/ph/Ph$1.vue"
 		}
 	},
 	"pages": [{
-		"path": "pages/index/index",
-		"style": {
-			"navigationBarTitleText": "uni-app"
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "视频首页",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom",
+				"app-plus": {
+					"bounce": "none"
+				}
+			}
+		},
+		{
+			"path": "pages/categories/categories",
+			"style": {
+				"navigationBarTitleText": "视频首页",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom",
+				"app-plus": {
+					"bounce": "none"
+				}
+			}
+		},
+		{
+			"path": "pages/video/short",
+			"style": {
+				"navigationBarTitleText": "视频首页",
+				"enablePullDownRefresh": true,
+				"navigationStyle": "custom",
+				"app-plus": {
+					"bounce": "none"
+				}
+			}
+		},
+		{
+			"path": "pages/profile/profile",
+			"style": {
+				"navigationBarTitleText": "视频首页",
+				"enablePullDownRefresh": true,
+				"navigationStyle": "custom",
+				"app-plus": {
+					"bounce": "none"
+				}
+			}
 		}
-	}],
+	],
 	"globalStyle": {
 		"navigationBarBackgroundColor": "#000000",
 		"navigationBarTextStyle": "white",
-		"navigationBarTitleText": "您的应用名称",
+		"navigationBarTitleText": "视频应用",
 		"backgroundColor": "#000000"
 	},
 	"tabBar": {
+	    "custom": true,
 	    "color": "#ffffff",
 	    "selectedColor": "#ff9000",
 	    "backgroundColor": "#000000",
 	    "borderStyle": "black",
-	    "list": [
-	      // 您的选项卡配置...
+	    "list": [{
+	            "pagePath": "pages/index/index",
+	            "text": "首页"
+	        },
+	        {
+	            "pagePath": "pages/categories/categories",
+	            "text": "分类"
+	        },
+	        {
+	            "pagePath": "pages/video/short",
+	            "text": "短视频"
+	        },
+	        {
+	            "pagePath": "pages/profile/profile",
+	            "text": "我的"
+	        }
 	    ]
-	  }
+	}
+
 }
