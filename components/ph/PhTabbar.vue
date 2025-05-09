@@ -9,12 +9,8 @@
 	</view>
 </template>
 <script>
-	import uniIcons from '@/uni_modules/uni-icons/components/uni-icons/uni-icons.vue';
 	export default {
 		name: 'PhTabbar',
-		components: {
-			uniIcons
-		},
 		props: {
 			current: {
 				type: Number,

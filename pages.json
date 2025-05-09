@@ -9,7 +9,7 @@
 	"pages": [{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "视频首页",
+				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false,
 				"navigationStyle": "custom",
 				"app-plus": {
@@ -20,7 +20,7 @@
 		{
 			"path": "pages/categories/categories",
 			"style": {
-				"navigationBarTitleText": "视频首页",
+				"navigationBarTitleText": "",
 				"enablePullDownRefresh": false,
 				"navigationStyle": "custom",
 				"app-plus": {
@@ -31,7 +31,7 @@
 		{
 			"path": "pages/video/short",
 			"style": {
-				"navigationBarTitleText": "视频首页",
+				"navigationBarTitleText": "",
 				"enablePullDownRefresh": true,
 				"navigationStyle": "custom",
 				"app-plus": {
@@ -42,7 +42,7 @@
 		{
 			"path": "pages/profile/profile",
 			"style": {
-				"navigationBarTitleText": "视频首页",
+				"navigationBarTitleText": "",
 				"enablePullDownRefresh": true,
 				"navigationStyle": "custom",
 				"app-plus": {
