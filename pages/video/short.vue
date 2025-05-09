@@ -722,6 +722,23 @@
 				console.log('[调试] 是否 Safari 浏览器:', this.isSafari);
 				// #endif
 			},
+			createVideoContext(index) {
+			  console.log(`[调试] 创建视频 ${index} 上下文`);
+			  try {
+			    const ctx = uni.createVideoContext(`video-${index}`, this);
+			    if (ctx) {
+			      this.videoContexts[index] = ctx;
+			      console.log(`[调试] 视频 ${index} 上下文创建成功`);
+			      return ctx;
+			    } else {
+			      console.error(`[调试] 创建视频 ${index} 上下文失败`);
+			      return null;
+			    }
+			  } catch (e) {
+			    console.error(`创建视频 ${index} 上下文错误:`, e);
+			    return null;
+			  }
+			},
 
 			createVideoContexts() {
 				console.log('[调试] 创建视频上下文');
