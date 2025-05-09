@@ -162,6 +162,17 @@
 		right: 150rpx;
 		z-index: 4;
 	}
+	/* 在您的样式中添加 */
+	.video-info,
+	.action-buttons,
+	.video-overlay {
+	  /* 确保Safari中元素始终可见 */
+	  transform: translateZ(0);
+	  -webkit-transform: translateZ(0);
+	  backface-visibility: visible;
+	  -webkit-backface-visibility: visible;
+	  will-change: auto; /* 不使用will-change以避免Safari的优化问题 */
+	}
 
 	.author-info {
 		display: flex;

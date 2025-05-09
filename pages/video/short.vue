@@ -108,6 +108,7 @@
 				</view>
 			</swiper-item>
 		</swiper>
+		<ph-tabbar :current="currentTabIndex" @change="switchTab"></ph-tabbar>
 	</view>
 </template>
 
@@ -150,7 +151,7 @@
 					},
 					{
 						id: '2',
-						videoUrl: 'https://avtshare01.rz.tu-ilmenau.de/avt-vqdb-uhd-1/test_1/segments/bigbuck_bunny_8bit_2000kbps_1080p_60.0fps_h264.mp4',
+						videoUrl: 'https://media.w3.org/2010/05/sintel/trailer.mp4',
 						coverUrl: 'https://example.com/cover2.jpg',
 						authorName: 'Sofia Staks',
 						authorAvatar: 'https://example.com/avatar2.jpg',
@@ -275,7 +276,23 @@
 					console.log('[调试] 带声音自动播放能力:', this.canAutoplayWithSound);
 				}
 			},
-
+			createVideoContext(index) {
+				console.log(`[调试] 创建视频 ${index} 上下文`);
+				try {
+					const ctx = uni.createVideoContext(`video-${index}`, this);
+					if (ctx) {
+						this.videoContexts[index] = ctx;
+						console.log(`[调试] 视频 ${index} 上下文创建成功`);
+						return ctx;
+					} else {
+						console.error(`[调试] 创建视频 ${index} 上下文失败`);
+						return null;
+					}
+				} catch (e) {
+					console.error(`创建视频 ${index} 上下文错误:`, e);
+					return null;
+				}
+			},
 			// 检测自动播放能力 - 优化版本
 			checkAutoplayCapability(withSound = false) {
 				return new Promise((resolve) => {
@@ -721,23 +738,6 @@
 				this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 				console.log('[调试] 是否 Safari 浏览器:', this.isSafari);
 				// #endif
-			},
-			createVideoContext(index) {
-			  console.log(`[调试] 创建视频 ${index} 上下文`);
-			  try {
-			    const ctx = uni.createVideoContext(`video-${index}`, this);
-			    if (ctx) {
-			      this.videoContexts[index] = ctx;
-			      console.log(`[调试] 视频 ${index} 上下文创建成功`);
-			      return ctx;
-			    } else {
-			      console.error(`[调试] 创建视频 ${index} 上下文失败`);
-			      return null;
-			    }
-			  } catch (e) {
-			    console.error(`创建视频 ${index} 上下文错误:`, e);
-			    return null;
-			  }
 			},
 
 			createVideoContexts() {
